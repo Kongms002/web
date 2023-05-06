@@ -1,14 +1,22 @@
 "use strict";
 
-class UserStorage {
-  static #users = {
-    id: ["minsoo", "wonho", "sihun"],
-    pw: ["123", "456", "789"],
-    name: ["민수", "원호", "시훈"],
-  };
+const db = require("../config/db");
 
-  static getUsers(...fields) {
-    const users = this.#users;
+class UserStorage {
+  static #getUserInfo(data, id) {
+    const users = JSON.parse(data);
+    const idx = users.id.indexOf(id);
+    const usersKeys = Object.keys(users);
+    const userInfo = usersKeys.reduce((newUser, info) => {
+      newUser[info] = users[info][idx];
+      return newUser;
+    }, {});
+    return userInfo;
+  }
+
+  static #getUsers(data, isAll, fields) {
+    const users = JSON.parse(data);
+    if (isAll) return users;
     const newUsers = fields.reduce((newUsers, field) => {
       if (users.hasOwnProperty(field)) {
         newUsers[field] = users[field];
@@ -18,16 +26,19 @@ class UserStorage {
     return newUsers;
   }
 
+  static getUsers(isAll, ...fields) {
+    
+  }
+
   // 해당 id에 해당하는 데이터만
   static getUserInfo(id) {
-    const users = this.#users;
-    const idx = users.id.indexOf(id);
-    const usersKeys = Object.keys(users);
-    const userInfo = usersKeys.reduce((newUser, info) => {
-      newUser[info] = users[info][idx];
-      return newUser;
-    }, {});
-    return userInfo;
+    db.query("SELECT * FROM users", (err, data) => {
+      console.log(data);
+    });
+  }
+
+  static async save(userInfo) {
+  
   }
 }
 
